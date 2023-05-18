@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  hrm_db:
+    image: mongo
+    ports:
+      - $MONGODB_MACHINE_PORT:$MONGODB_PORT
+    volumes:
+      - hrm-db-volume:/data/db
+  hrm_server:
+    depends_on:
+      - hrm_db
+    build: ./app
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $NODE_PORT:$NODE_MACHINE_PORT
+    stdin_open: true
+    tty: true
+    volumes:
+      - hrm-server-volume:/app/uploads
+
+volumes: 
+  hrm-db-volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/backend/db-volume
+  hrm-server-volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/backend/server-volume
